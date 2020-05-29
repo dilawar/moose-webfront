@@ -7,18 +7,28 @@
     >
       <div class="d-flex align-center">
         <v-img
-          alt="MOOSE Logo"
+          alt="Vuetify Logo"
           class="shrink mr-2"
           contain
-          src="https://moose.readthedocs.io/en/master/_static/moose_logo.png"
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
           transition="scale-transition"
-          width="60"
-        /> MOOSE
+          width="40"
+        />
+
+        <v-img
+          alt="Vuetify Name"
+          class="shrink mt-1 hidden-sm-and-down"
+          contain
+          min-width="100"
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
+          width="100"
+        />
       </div>
+
       <v-spacer></v-spacer>
 
       <v-btn
-        href="https://github.com/BhallaLab/moose-core/releases/latest"
+        href="https://github.com/vuetifyjs/vuetify/releases/latest"
         target="_blank"
         text
       >
@@ -28,19 +38,19 @@
     </v-app-bar>
 
     <v-content>
-      <HelloMOOSE/>
+      <HelloWorld/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloMOOSE from './components/HelloMOOSE';
+import HelloWorld from './components/HelloWorld';
 
 export default {
   name: 'App',
 
   components: {
-    HelloMOOSE,
+    HelloWorld,
   },
 
   data: () => ({
