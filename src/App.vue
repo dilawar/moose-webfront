@@ -1,10 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
+    <v-app-bar app color="primary" dark >
       <div class="d-flex align-center">
         <v-img
           alt="MOOSE Logo"
@@ -28,19 +24,19 @@
     </v-app-bar>
 
     <v-content>
-      <HelloMOOSE/>
+      <moose/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloMOOSE from './components/HelloMOOSE';
+import moose from './components/MOOSE';
 
 export default {
   name: 'App',
 
   components: {
-    HelloMOOSE,
+    moose,
   },
 
   data: () => ({
