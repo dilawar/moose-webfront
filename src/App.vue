@@ -28,7 +28,7 @@
       <v-spacer></v-spacer>
 
       <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
+        href="https://github.com/BhallaLab/moose-core/releases/latest"
         target="_blank"
         text
       >
@@ -38,19 +38,19 @@
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <HelloMOOSE/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import HelloMOOSE from './components/HelloMOOSE';
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+    HelloMOOSE,
   },
 
   data: () => ({
