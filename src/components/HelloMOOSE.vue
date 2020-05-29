@@ -3,7 +3,7 @@
 
     <v-row class="text-center">
       <v-col cols=6>
-        <editor v-model="cotent" @init="editorInit"
+        <editor v-model="content" @init="editorInit"
           lang="python"
           width="500"
           height="200" >
@@ -15,6 +15,16 @@
           </VuePerfectScrollbar>
         </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        <label class="text-reader">
+          <input type="file" @change="loadTextFromFile">
+        </label>
+      </v-col>
+      <v-col>
+        <v-btn>Submit</v-btn>
+      </v-col>
+    </v-row>
 
   </v-container>
 </template>
@@ -22,72 +32,35 @@
 <script>
 import VuePerfectScrollbar from 'vue-perfect-scrollbar/index.vue'
 export default {
-  name: 'Hello MOOSE',
+  name: 'MOOSE',
   data: () => ({
     content: '',
-    ecosystem: [
-      {
-        text: 'vuetify-loader',
-        href: 'https://github.com/vuetifyjs/vuetify-loader',
-      },
-      {
-        text: 'github',
-        href: 'https://github.com/vuetifyjs/vuetify',
-      },
-      {
-        text: 'awesome-vuetify',
-        href: 'https://github.com/vuetifyjs/awesome-vuetify',
-      },
-    ],
-    importantLinks: [
-      {
-        text: 'Documentation',
-        href: 'https://vuetifyjs.com',
-      },
-      {
-        text: 'Chat',
-        href: 'https://community.vuetifyjs.com',
-      },
-      {
-        text: 'Made with Vuetify',
-        href: 'https://madewithvuejs.com/vuetify',
-      },
-      {
-        text: 'Twitter',
-        href: 'https://twitter.com/vuetifyjs',
-      },
-      {
-        text: 'Articles',
-        href: 'https://medium.com/vuetify',
-      },
-    ],
-    whatsNext: [
-      {
-        text: 'Explore components',
-        href: 'https://vuetifyjs.com/components/api-explorer',
-      },
-      {
-        text: 'Select a layout',
-        href: 'https://vuetifyjs.com/layout/pre-defined',
-      },
-      {
-        text: 'Frequently Asked Questions',
-        href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
-      },
-    ],
   }),
   components: {
     editor : require('vue2-ace-editor'),
     VuePerfectScrollbar,
   },
   methods: {
+    loadTextFromFile: function(ev) {
+      const self = this;
+      const file = ev.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        console.log(e.target.result);
+        self.content = e.target.result;
+      };
+      reader.readAsText(file);
+    },
     editorInit: function() {
       require('brace/ext/language_tools')
       require('brace/mode/html')     
-      require('brace/mode/javascript')  
+      require('brace/mode/python')  
       require('brace/mode/less')
       require('brace/theme/chrome')
-      require('brace/snippets/javascript') 
+      require('brace/snippets/python') 
+    },
+    scrollHandle: function(evt) {
+      console.log(evt);
     },
   },
 }
