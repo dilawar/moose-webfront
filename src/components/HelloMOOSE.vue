@@ -36,6 +36,9 @@ export default {
   data: () => ({
     content: '',
   }),
+  mounted: function() {
+    console.log('Mounted');
+  },
   components: {
     editor : require('vue2-ace-editor'),
     VuePerfectScrollbar,
@@ -46,7 +49,7 @@ export default {
       const file = ev.target.files[0];
       const reader = new FileReader();
       reader.onload = function(e) {
-        console.log(e.target.result);
+        //console.log(e.target.result);
         self.content = e.target.result;
       };
       reader.readAsText(file);
