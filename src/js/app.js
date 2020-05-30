@@ -23,23 +23,33 @@ import App from '../components/app.vue';
 Framework7.use(Framework7Vue);
 
 // mixin
-var mixIn = {
+Vue.mixin({
+   data: function() {
+      return {
+        tempA: '',
+      }
+   },
    methods: {
       // available in all components.
-      status: function() {
+      getRequest: function(endpoint) {
+         const self = this;
+         const app = self.$f7;
+         let url = self.$store.getters.server.url;
+         let x  = app.request.promise.json(url + '/'+endpoint).then( x => {
+            self.$store.commit('MOOSE_STATUS', x.data.MOOSE_STATUS);
+         });
       },
-   }
-}
+   },
+});
 
 // Init App
-new Vue({
-   mixins: [mixIn],
+export default new Vue({
    el: '#app',
-   store,
+   store: store,
    render: (h) => h(App),
 
    // Register App Component
    components: {
-      app: App
+      app: App,
    },
 });

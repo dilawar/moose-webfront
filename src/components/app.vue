@@ -31,7 +31,8 @@
       <f7-link tab-link="#view-settings" icon-ios="f7:gear" icon-aurora="f7:gear" icon-md="material:settings" text="Settings"></f7-link>
     </f7-toolbar>
 
-    <!-- Your main view/tab, should have "view-main" class. It also has "tab-active" class -->
+    <!-- Your main view/tab, should have "view-main" class. 
+    It also has "tab-active" class -->
     <f7-view id="view-home" main tab tab-active url="/"></f7-view>
 
     <!-- Settings View -->
