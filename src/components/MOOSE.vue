@@ -1,5 +1,21 @@
 <template>
   <v-container>
+    <v-row>
+      <v-tabs
+        background-color="cyan"
+        dark
+        next-icon="mdi-arrow-right-bold-box-outline"
+        prev-icon="mdi-arrow-left-bold-box-outline"
+        show-arrows>
+        <v-tabs-slider color="yellow"></v-tabs-slider>
+        <v-tab
+          v-for="i in 3"
+          :key="i"
+          :href="'#tab-' + i">
+          Item {{ i }}
+        </v-tab>
+      </v-tabs>
+    </v-row>
 
     <div class="">
       <v-row class="text-center" v-if="moose_about.version">
