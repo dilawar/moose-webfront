@@ -31,6 +31,8 @@
         </f7-list-input>
         <f7-list-item>
           <f7-button raised tooltip="Submit to server"
+            :disabled="content === ''"
+            @click="submitFile"
             slot="after">Submit</f7-button>
         </f7-list-item>
       </f7-list>
@@ -96,6 +98,17 @@ export default {
 
       self.mooseStatus = setInterval( x => self.getRequest('/status'), 10000);
 
+    },
+    submitFile: function() {
+      const self = this;
+      const app = self.$f7;
+      if(! content) {
+        console.log("Empty file");
+        return;
+      }
+      self.postRequest('/run/file', {content: self.content}).then(x=>{ 
+        console.log(x.data);
+      });
     },
   },
 }

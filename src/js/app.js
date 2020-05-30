@@ -39,6 +39,12 @@ Vue.mixin({
             self.$store.commit('MOOSE_STATUS', x.data.MOOSE_STATUS);
          });
       },
+      postRequest: function(endpoint, data) {
+         const self = this;
+         const app = self.$f7;
+         let url = self.$store.getters.server.url;
+         return app.request.promise.postJSON(url+'/'+endpoint, data);
+      },
    },
 });
 
