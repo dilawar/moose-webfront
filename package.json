@@ -16,9 +16,10 @@
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
     "vue-nprogress": "^0.1.5",
-    "vue-perfect-scrollbar": "^0.2.1",
     "vue2-ace-editor": "^0.0.15",
-    "vuetify": "^2.2.11"
+    "vue2-perfect-scrollbar": "^1.5.0",
+    "vuetify": "^2.2.11",
+    "webpack": "^4.43.0"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
