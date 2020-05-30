@@ -12,35 +12,49 @@
         <f7-link icon-ios="f7:menu" icon-aurora="f7:menu"
           icon-md="material:menu" panel-open="right"></f7-link>
       </f7-nav-right>
-
     </f7-navbar>
 
+    <!-- progress bar -->
+    <f7-progressbar :progress="currentProgress" color=red 
+      v-if="currentProgress>0">
+    </f7-progressbar>
+
     <!-- Page content-->
-    <f7-block>
-      <f7-list media-list media-list>
-        <f7-list-item>
-          <editor v-model="content" 
-            @init="editorInit" 
-            lang="python"
-            theme="chrome" 
-            width="100%" 
-            height="50vh">
-          </editor>
-        </f7-list-item>
-        <f7-list-input type="file" 
-          label="Load model"
-          :value="content"
-          @change="loadTextFromFile"
-          inline-label>
-        </f7-list-input>
-        <f7-list-item>
-          <f7-button raised tooltip="Submit to server"
-            :disabled="content === ''"
-            @click="submitFile"
-            slot="after">Submit</f7-button>
-        </f7-list-item>
-      </f7-list>
-    </f7-block>
+    <f7-list media-list media-list>
+      <f7-list-item>
+        <editor v-model="content" 
+          @init="editorInit" 
+          lang="python"
+          theme="chrome" 
+          width="100%" 
+          height="50vh">
+        </editor>
+      </f7-list-item>
+      <f7-list-input type="file" 
+        label="Load model"
+        :value="content"
+        @change="loadTextFromFile"
+        inline-label>
+      </f7-list-input>
+
+
+      <f7-list-item>
+        <f7-button raised 
+          @click="stopSimulation"
+          color="red" raised fill
+          v-if="simHasStarted"
+          slot="title">
+          Stop
+        </f7-button>
+        <f7-button raised  fill
+          tooltip="Submit to server"
+          :disabled="content === ''"
+          @click="startSimulation"
+          slot="after">
+          Submit
+        </f7-button>
+      </f7-list-item>
+    </f7-list>
 
     <f7-block-footer style="padding-bottom:10px">
       <f7-list style="list-style-type:none" media-list no-hairlines>
@@ -50,7 +64,8 @@
             class="col-50">
           </f7-list-item>
           <f7-list-item header="Status" 
-            :footer="$store.getters.server.status"  
+            :footer="mooseStatus.MOOSE_STATUS"  
+            @click="toggleStatusFetching"
             class="col-50">
             <!--
             <f7-preloader slot="media" :size="20" color="yellow">
@@ -69,7 +84,9 @@ export default {
   data() {
     return {
       content: '',
-      mooseStatus: null,
+      currentProgress: 0,
+      simHasStarted: false,
+      mooseStatus: {'MOOSE_STATUS':'UNKNOWN'},
     }
   },
   components: {
@@ -77,7 +94,7 @@ export default {
   },
   mounted() {
     const self = this;
-    self.enableMooseStatusFetch();
+    self.mooseStatusFetch();
   },
   methods: {
     editorInit: function () {
@@ -98,29 +115,66 @@ export default {
     mooseStatusFetch: function() {
       const self = this;
 
-      if(self.mooseStatus !== null)
-        return;
-      self.mooseStatus = setInterval(fetchStatus, 10000);
+      if(self.mooseStatus !== null) {
+        console.log("Already fetching ...");
+        clearInterval(self.mooseStatus);
+        self.mooseStatus = null;
+      }
+      self.mooseStatus = setInterval(self.fetchStatus, 10*1000);
     },
     fetchStatus: function() {
       const self = this;
       self.getRequest('status').then(function(x) {
-        console.log('x', x);
+        self.mooseStatus = JSON.parse(x.data);
+        /* console.log('moose status', self.mooseStatus); */
+        self.$store.commit('MOOSE_STATUS', self.mooseStatus.MOOSE_STATUS);
+        if('MOOSE_CURRENT_TIME' in self.mooseStatus) {
+          self.currentProgress = 100 * self.mooseStatus.MOOSE_CURRENT_TIME 
+            / self.mooseStatus.MOOSE_RUNTIME;
+          console.log('progress', self.currentProgress);
+        }
       });
     },
-    clearFetchInterval: function() {
+    clearMooseStatusFetch: function() {
       const self = this;
       clearInterval(self.mooseStatus);
+      self.mooseStatus = null;
     },
-    submitFile: function() {
+    toggleStatusFetching: function() {
+      const self = this;
+      if(self.mooseStatus === null)
+        self.mooseStatusFetch();
+      else
+        self.clearMooseStatusFetch();
+
+    },
+    startSimulation: function() {
       const self = this;
       const app = self.$f7;
       if(! content) {
         console.log("Empty file");
         return;
       }
-      self.postRequest('/run/file', {content: self.content}).then(x=>{ 
-        console.log(x.data);
+
+      self.simHasStarted = true;
+      self.currentProgress = 0;
+
+      self.postRequest('/run/file', {content: self.content}).then(res => { 
+        if(res.data.status === 'finished') {
+          self.currentProgress = 100;
+          app.dialog.alert("Simualtion over", "MOOSE"
+            , () => self.currentProgress = 0.0
+            , null);
+          self.simHasStarted = false;
+        }
+      });
+    },
+    stopSimulation: function() {
+      const self = this;
+      if(! self.simHasStarted)
+        return;
+      self.postRequest('/run/stop').then(function(x) {
+        console.log('stop', x);
       });
     },
   },

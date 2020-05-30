@@ -31,13 +31,13 @@ Vue.mixin({
    },
    methods: {
       // available in all components.
-      getRequest: function(endpoint) {
+      getRequest: async function(endpoint) {
          const self = this;
          const app = self.$f7;
          let url = self.$store.getters.server.url;
-         return app.request.promise.json(url+'/'+endpoint);
+         return app.request.promise.get(url+'/'+endpoint);
       },
-      postRequest: function(endpoint, data) {
+      postRequest: async function(endpoint, data) {
          const self = this;
          const app = self.$f7;
          let url = self.$store.getters.server.url;
