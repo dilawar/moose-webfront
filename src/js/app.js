@@ -1,6 +1,8 @@
 // Import Vue
 import Vue from 'vue';
 
+import store from './store.js'
+
 // Import Framework7
 import Framework7 from './framework7-custom.js';
 
@@ -20,13 +22,24 @@ import App from '../components/app.vue';
 // Init Framework7-Vue Plugin
 Framework7.use(Framework7Vue);
 
+// mixin
+var mixIn = {
+   methods: {
+      // available in all components.
+      status: function() {
+      },
+   }
+}
+
 // Init App
 new Vue({
-  el: '#app',
-  render: (h) => h(App),
+   mixins: [mixIn],
+   el: '#app',
+   store,
+   render: (h) => h(App),
 
-  // Register App Component
-  components: {
-    app: App
-  },
+   // Register App Component
+   components: {
+      app: App
+   },
 });
