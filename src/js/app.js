@@ -35,9 +35,7 @@ Vue.mixin({
          const self = this;
          const app = self.$f7;
          let url = self.$store.getters.server.url;
-         let x  = app.request.promise.json(url + '/'+endpoint).then( x => {
-            self.$store.commit('MOOSE_STATUS', x.data.MOOSE_STATUS);
-         });
+         return app.request.promise.json(url+'/'+endpoint);
       },
       postRequest: function(endpoint, data) {
          const self = this;
