@@ -14,11 +14,6 @@
       </f7-nav-right>
     </f7-navbar>
 
-    <!-- progress bar -->
-    <f7-progressbar :progress="currentProgress" color=red 
-      v-if="currentProgress>=0">
-    </f7-progressbar>
-
     <!-- Page content-->
     <f7-list media-list media-list>
       <f7-list-item>
@@ -37,8 +32,21 @@
         inline-label>
       </f7-list-input>
 
+      <!-- Result broser -->
+      <f7-list-item v-if="images.length > 0">
+        <f7-photo-browser :photos="images" type="popup" ref="results">
+        </f7-photo-browser>
+      </f7-list-item>
+
 
       <f7-list-item>
+        <!-- progress bar -->
+        <f7-progressbar :progress="currentProgress" 
+          color=red 
+          v-if="currentProgress > 0.0"
+          slot="footer">
+        </f7-progressbar>
+
         <f7-button raised 
           @click="stopSimulation"
           color="red" raised fill
@@ -80,12 +88,13 @@
 </template>
 
 <script>
-var bz2 = require('unbzip2-stream');
+import { saveAs } from 'file-saver';
 
 export default {
   data() {
     return {
       content: '',
+      images: [],
       currentProgress: -1.0,
       simHasStarted: false,
       mooseStatus: {'MOOSE_STATUS':'UNKNOWN'},
@@ -165,12 +174,27 @@ export default {
 
       self.postRequest('/run/file', {content: self.content}).then(res => { 
         if(res.data.status === 'finished') {
-          let data = Buffer.from(res.data.output, 'base64');
+          self.images = [];
+          res.data.images.forEach((x, k) => {
+            //console.log('x', x);
+            let html = "<img src='data:image/png;base64, "+x+"' />";
+            self.images.push({html: html});
+          });
+
+          //// Save data locally.
+          //var blob = new Blob([data], {type: 'octet/stream'});
+          //var filename = 'results.tar.bz';
+          //saveAs(blob, filename);
+
           self.currentProgress = 100;
           //app.preloader.hide();
-          app.dialog.alert("Simualtion over. Time taken "+res.data.time+' sec.'
+          app.dialog.confirm(
+            "Simualtion over in "+res.data.time+' sec. Open images?'
             , "MOOSE"
-            , () => self.currentProgress = -1.0
+            , function() {
+              self.currentProgress = -1.0;
+              self.$refs.results.open();
+            }
             , null);
           self.simHasStarted = false;
         }
