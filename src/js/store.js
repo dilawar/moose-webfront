@@ -9,7 +9,7 @@ export default new Vuex.Store({
       profile: {},
       apiKeyGMap: '',
       server : {
-         url: 'http://192.168.1.8:31417',
+         url: 'http://162.241.114.222:320',
          status: 'UNKNOWN',
       },
    },
