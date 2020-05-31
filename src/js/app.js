@@ -3,6 +3,10 @@ import Vue from 'vue';
 
 import store from './store.js'
 
+import PerfectScrollbar from 'vue2-perfect-scrollbar'
+import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
+Vue.use(PerfectScrollbar)
+
 // Import Framework7
 import Framework7 from './framework7-custom.js';
 

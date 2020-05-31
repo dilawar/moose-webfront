@@ -13,22 +13,49 @@
     </f7-navbar>
 
     <!-- Page content-->
-    <f7-list media-list media-list>
+    <f7-list media-list no-hairlines>
       <f7-list-item>
-        <editor v-model="content" 
-          @init="editorInit" 
-          lang="python"
-          theme="chrome" 
-          width="100%" 
-          height="50vh">
-        </editor>
+        <f7-row>
+          <f7-col large=70 xlarge=50 resizable>
+            <editor v-model="content" 
+              @init="editorInit" 
+              lang="python"
+              theme="chrome" 
+              height="50vh">
+            </editor>
+          </f7-col>
+          <f7-col large=30 xlarge=50 class="bg-color-gray">
+            <perfect-scrollbar v-html="scrollcontent" :options="{height:'50vh'}">
+            </perfect-scrollbar>
+          </f7-col>
+        </f7-row>
       </f7-list-item>
-      <f7-list-input type="file" 
-        label="Load model"
-        :value="content"
-        @change="loadTextFromFile"
-        inline-label>
-      </f7-list-input>
+      <f7-list-item>
+        <f7-row>
+          <f7-col>
+            <f7-list-input :value="content" 
+              @change="loadTextFromFile"
+              type='file' 
+              accept="text/*.py" />
+            </f7-list-input>
+          </f7-col>
+          <f7-col v-if="simHasStarted">
+            <f7-button raised 
+              @click="stopSimulation"
+              color="red" raised fill>
+              Stop
+            </f7-button>
+          </f7-col>
+          <f7-col>
+            <f7-button raised  fill
+              tooltip="Submit to server"
+              :disabled="content.length == 0"
+              @click="startSimulation">
+              Submit
+            </f7-button>
+          </f7-col>
+        </f7-row>
+      </f7-list-item>
 
       <!-- Result broser -->
       <f7-list-item v-if="images.length > 0">
@@ -36,29 +63,13 @@
         </f7-photo-browser>
       </f7-list-item>
 
-
       <f7-list-item>
         <!-- progress bar -->
         <f7-progressbar :progress="currentProgress" 
           color=red 
           v-if="currentProgress > 0.0"
-          slot="footer">
-        </f7-progressbar>
-
-        <f7-button raised 
-          @click="stopSimulation"
-          color="red" raised fill
-          v-if="simHasStarted"
-          slot="title">
-          Stop
-        </f7-button>
-        <f7-button raised  fill
-          tooltip="Submit to server"
-          :disabled="content === ''"
-          @click="startSimulation"
           slot="after">
-          Submit
-        </f7-button>
+        </f7-progressbar>
       </f7-list-item>
     </f7-list>
 
@@ -92,6 +103,7 @@ export default {
   data() {
     return {
       content: '',
+      scrollcontent: '<h4>Logs ....</h4>',
       images: [],
       currentProgress: -1.0,
       simHasStarted: false,
@@ -160,7 +172,7 @@ export default {
     startSimulation: function() {
       const self = this;
       const app = self.$f7;
-      if(! content) {
+      if(! self.content) {
         console.log("Empty file");
         return;
       }
@@ -172,28 +184,26 @@ export default {
 
       self.postRequest('/run/file', {content: self.content}).then(res => { 
         if(res.data.status === 'finished') {
+
           self.images = [];
+          self.scrollcontent += res.data.output.replace('\n', '<br/>');
+
           res.data.images.forEach((x, k) => {
             //console.log('x', x);
             let html = "<img src='data:image/png;base64, "+x+"' />";
             self.images.push({html: html});
           });
 
-          //// Save data locally.
-          //var blob = new Blob([data], {type: 'octet/stream'});
-          //var filename = 'results.tar.bz';
-          //saveAs(blob, filename);
-
           self.currentProgress = 100;
           //app.preloader.hide();
-          app.dialog.confirm(
-            "Simualtion over in "+res.data.time+' sec. Open images?'
-            , "MOOSE"
-            , function() {
+          var msg = "Simualtion over in "+res.data.time+" sec.";
+          if(self.images.length > 0) {
+            msg += " Open images?";
+          }
+          app.dialog.confirm(msg, "MOOSE", function() {
               self.currentProgress = -1.0;
               self.$refs.results.open();
-            }
-            , null);
+            }, null);
           self.simHasStarted = false;
         }
       });

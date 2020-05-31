@@ -30,6 +30,7 @@
     "unbzip2-stream": "^1.4.3",
     "vue": "^2.6.11",
     "vue2-ace-editor": "0.0.15",
+    "vue2-perfect-scrollbar": "^1.5.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
