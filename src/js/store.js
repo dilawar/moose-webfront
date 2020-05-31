@@ -9,8 +9,8 @@ export default new Vuex.Store({
       profile: {},
       apiKeyGMap: '',
       server : {
-         //url: 'http://162.241.114.222:320',
-         url: 'http://162.241.114.222:31417',
+         url: 'http://162.241.114.222:320',
+         // url: 'http://162.241.114.222:31417',
          status: 'UNKNOWN',
       },
    },
