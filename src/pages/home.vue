@@ -16,7 +16,7 @@
 
     <!-- progress bar -->
     <f7-progressbar :progress="currentProgress" color=red 
-      v-if="currentProgress>0">
+      v-if="currentProgress>=0">
     </f7-progressbar>
 
     <!-- Page content-->
@@ -80,11 +80,13 @@
 </template>
 
 <script>
+var bz2 = require('unbzip2-stream');
+
 export default {
   data() {
     return {
       content: '',
-      currentProgress: 0,
+      currentProgress: -1.0,
       simHasStarted: false,
       mooseStatus: {'MOOSE_STATUS':'UNKNOWN'},
     }
@@ -131,7 +133,7 @@ export default {
         if('MOOSE_CURRENT_TIME' in self.mooseStatus) {
           self.currentProgress = 100 * self.mooseStatus.MOOSE_CURRENT_TIME 
             / self.mooseStatus.MOOSE_RUNTIME;
-          console.log('progress', self.currentProgress);
+          //console.log('progress', self.currentProgress);
         }
       });
     },
@@ -157,23 +159,31 @@ export default {
       }
 
       self.simHasStarted = true;
-      self.currentProgress = 0;
+      self.currentProgress = 0.0;
+
+      // app.preloader.show();
 
       self.postRequest('/run/file', {content: self.content}).then(res => { 
         if(res.data.status === 'finished') {
+          let data = Buffer.from(res.data.output, 'base64');
           self.currentProgress = 100;
-          app.dialog.alert("Simualtion over", "MOOSE"
-            , () => self.currentProgress = 0.0
+          //app.preloader.hide();
+          app.dialog.alert("Simualtion over. Time taken "+res.data.time+' sec.'
+            , "MOOSE"
+            , () => self.currentProgress = -1.0
             , null);
           self.simHasStarted = false;
         }
       });
+
+      setTimeout(() => app.preloader.hide(), 10*60*1000);
     },
     stopSimulation: function() {
       const self = this;
       if(! self.simHasStarted)
         return;
       self.postRequest('/run/stop').then(function(x) {
+        // app.preloader.hide();
         console.log('stop', x);
       });
     },
