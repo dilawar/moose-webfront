@@ -2,7 +2,6 @@
   <f7-page name="home">
     <!-- Top Navbar -->
     <f7-navbar :sliding="false">
-
       <f7-nav-left>
         <f7-link icon-ios="f7:menu" icon-aurora="f7:menu" 
           icon-md="material:menu" panel-open="left"></f7-link>
@@ -13,65 +12,64 @@
     </f7-navbar>
 
     <!-- Page content-->
-    <f7-list media-list no-hairlines>
-      <f7-list-item>
-        <f7-row>
-          <f7-col large=70 xlarge=50 resizable>
-            <editor v-model="content" 
-              @init="editorInit" 
-              lang="python"
-              theme="chrome" 
-              height="50vh">
-            </editor>
-          </f7-col>
-          <f7-col large=30 xlarge=50 class="bg-color-gray">
-            <perfect-scrollbar v-html="scrollcontent" :options="{height:'50vh'}">
-            </perfect-scrollbar>
-          </f7-col>
-        </f7-row>
-      </f7-list-item>
-      <f7-list-item>
-        <f7-row>
-          <f7-col>
-            <f7-list-input :value="content" 
-              @change="loadTextFromFile"
-              type='file' 
-              accept="text/*.py" />
-            </f7-list-input>
-          </f7-col>
-          <f7-col v-if="simHasStarted">
-            <f7-button raised 
-              @click="stopSimulation"
-              color="red" raised fill>
-              Stop
-            </f7-button>
-          </f7-col>
-          <f7-col>
-            <f7-button raised  fill
-              tooltip="Submit to server"
-              :disabled="content.length == 0"
-              @click="startSimulation">
-              Submit
-            </f7-button>
-          </f7-col>
-        </f7-row>
-      </f7-list-item>
+    <f7-block padding>
+      <f7-row>
+        <f7-col width=70 resizable>
+          <editor v-model="content" 
+            @init="editorInit" 
+            lang="python"
+            theme="chrome" height="60vh">
+          </editor>
+        </f7-col>
+        <f7-col width=30>
+          <perfect-scrollbar v-html="scrollcontent" >
+          </perfect-scrollbar>
+        </f7-col>
+      </f7-row>
+      <f7-row>
+        <f7-col>
+          <f7-input :value="content" 
+            @change="loadTextFromFile"
+            type='file' 
+            accept="text/*.py" />
+        </f7-input>
+      </f7-col>
+      <f7-col v-if="simHasStarted">
+        <f7-button raised 
+          @click="stopSimulation"
+          color="red" raised fill>
+          Stop
+        </f7-button>
+      </f7-col>
+      <f7-col v-else>
+        <f7-button raised  fill
+          tooltip="Submit to server"
+          :disabled="content.length == 0"
+          @click="startSimulation">
+          Submit
+        </f7-button>
+      </f7-col>
+    </f7-row>
 
+    <f7-row>
       <!-- Result broser -->
-      <f7-list-item v-if="images.length > 0">
+      <div v-if="images.length > 0">
         <f7-photo-browser :photos="images" type="popup" ref="results">
         </f7-photo-browser>
-      </f7-list-item>
-
-      <f7-list-item>
+      </div>
+    </f7-row>
+    <f7-row>
+      <f7-col>
         <!-- progress bar -->
         <f7-progressbar :progress="currentProgress" 
           color=red 
           v-if="currentProgress > 0.0"
           slot="after">
         </f7-progressbar>
-      </f7-list-item>
-    </f7-list>
+      </f7-col>
+    </f7-row>
+
+  </f7-block>
 
     <f7-block-footer style="padding-bottom:10px">
       <f7-list style="list-style-type:none" media-list no-hairlines>
