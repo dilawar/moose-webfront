@@ -47,6 +47,16 @@ Vue.mixin({
          let url = self.$store.getters.server.url;
          return app.request.promise.postJSON(url+'/'+endpoint, data);
       },
+      notify: function(title, msg, timeout=5000) {
+         const self = this;
+         const app = self.$f7;
+         app.notification.create({
+            title: title,
+            text: msg,
+            closeTimeout: timeout,
+            closeButton: true,
+         }).open();
+      },
    },
 });
 

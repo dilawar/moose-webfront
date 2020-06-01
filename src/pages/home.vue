@@ -52,44 +52,29 @@
     </f7-row>
 
     <f7-row>
-      <!-- Result broser -->
+      <!-- Result browser -->
       <div v-if="images.length > 0">
         <f7-photo-browser :photos="images" type="popup" ref="results">
         </f7-photo-browser>
       </div>
     </f7-row>
     <f7-row>
-      <f7-col>
-        <!-- progress bar -->
-        <f7-progressbar :progress="currentProgress" 
-          color=red 
-          v-if="currentProgress > 0.0"
-          slot="after">
-        </f7-progressbar>
-      </f7-col>
+      <!-- progress bar -->
+      <f7-progressbar :progress="currentProgress" color=red
+        v-if="currentProgress >= 0.0">
+      </f7-progressbar>
     </f7-row>
-
   </f7-block>
 
-    <f7-block-footer style="padding-bottom:10px">
-      <f7-list style="list-style-type:none" media-list no-hairlines>
-        <f7-row>
-          <f7-list-item header="Server" 
-            :footer="$store.getters.server.url"
-            class="col-50">
-          </f7-list-item>
-          <f7-list-item header="Status" 
-            :footer="mooseStatus.MOOSE_STATUS"  
-            @click="toggleStatusFetching"
-            class="col-50">
-            <!--
-            <f7-preloader slot="media" :size="20" color="yellow">
-              -->
-            </f7-preloader>
-          </f7-list-item>
-        </f7-row>
-      </f7-list>
-    </f7-block-footer>
+  <f7-block-footer style="padding-bottom:5px;padding-top:10px">
+    <f7-row>
+      <f7-item v-html="$store.getters.server.url" class="col-25">
+      </f7-item>
+      <f7-item v-html="mooseStatus.MOOSE_STATUS"  
+        @click="toggleStatusFetching" class="col-25">
+      </f7-item>
+    </f7-row>
+  </f7-block-footer>
 
   </f7-page>
 </template>
@@ -113,6 +98,15 @@ export default {
   },
   mounted() {
     const self = this;
+    const app = self.$f7;
+
+    app.dialog.preloader("Pinging MOOSE server");
+    self.getRequest('/ping').then(function(x) {
+      console.log(x.data, 'status');
+      self.notify("Success", x.data);
+      app.dialog.close();
+    });
+    setTimeout(() => app.dialog.close(), 60*1000);
     self.mooseStatusFetch();
   },
   methods: {
@@ -193,6 +187,7 @@ export default {
           });
 
           self.currentProgress = 100;
+          //self.notify("Finished", "Simualtion is over");
           //app.preloader.hide();
           var msg = "Simualtion over in "+res.data.time+" sec.";
           if(self.images.length > 0) {
